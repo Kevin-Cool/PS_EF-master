@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		db.txt = db.txt
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityFrameworkRepository", "EntityFrameworkRepository\EntityFrameworkRepository.csproj", "{165D208F-E4DB-4916-8AFC-324CA2104F68}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADO.NET", "ADO.NET\ADO.NET.csproj", "{3A344D7D-DB0F-4578-A7DB-F666B5A2C93A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,10 +40,10 @@ Global
 		{E40D15DD-8236-4B21-8503-1AEEA2CC4DB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E40D15DD-8236-4B21-8503-1AEEA2CC4DB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E40D15DD-8236-4B21-8503-1AEEA2CC4DB5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{165D208F-E4DB-4916-8AFC-324CA2104F68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{165D208F-E4DB-4916-8AFC-324CA2104F68}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{165D208F-E4DB-4916-8AFC-324CA2104F68}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{165D208F-E4DB-4916-8AFC-324CA2104F68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A344D7D-DB0F-4578-A7DB-F666B5A2C93A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A344D7D-DB0F-4578-A7DB-F666B5A2C93A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A344D7D-DB0F-4578-A7DB-F666B5A2C93A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A344D7D-DB0F-4578-A7DB-F666B5A2C93A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

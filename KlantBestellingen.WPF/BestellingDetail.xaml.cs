@@ -100,8 +100,9 @@ namespace KlantBestellingen.WPF
                 if (_order == value)
                 {
                     return;
-                }                
-                if(value == null)
+                }
+                
+                if (value == null)
                 {
                     // We doen een reset van de nuttige inhoud op het bestellingsvenster:
                     // Bestelling bevat geen producten:
@@ -118,6 +119,7 @@ namespace KlantBestellingen.WPF
                     _order = null;
                     return;
                 }
+                
                 _order = value;
                 var orders = _order.GeefProducten();
                 _orderProducts = new ObservableCollection<Product>();

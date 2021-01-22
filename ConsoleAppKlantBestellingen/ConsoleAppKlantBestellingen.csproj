@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BusinessLayer\BusinessLayer.csproj" />
-    <ProjectReference Include="..\EntityFrameworkRepository\EntityFrameworkRepository.csproj" />
   </ItemGroup>
 
 </Project>
