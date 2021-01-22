@@ -15,7 +15,7 @@ namespace KlantBestellingen.WPF
 
         public Controller()
         {
-            Update()
+            Update();
             /*
             var timer = new System.Threading.Timer((e) =>
             {
