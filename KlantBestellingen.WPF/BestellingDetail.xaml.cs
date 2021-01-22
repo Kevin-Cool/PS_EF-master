@@ -196,7 +196,12 @@ namespace KlantBestellingen.WPF
         {
             if (CbProducts.SelectedIndex < 0)
                 return;
-            _orderProducts.Remove(CbProducts.SelectedItem as Product);
+            if (Eddit)
+            {
+                _order.VerwijderProduct(CbProducts.SelectedItem as Product, 1);
+            }
+             _orderProducts.Remove(CbProducts.SelectedItem as Product);
+            
             NotifyPropertyChanged("TotalPrice"); // Doordat ik zeg: de totaalprijs is veranderd, zal XAML WPF deze property opnieuw ophalen om de user interface aan te passen
             
         }
@@ -205,7 +210,12 @@ namespace KlantBestellingen.WPF
         {
             if (CbProducts.SelectedIndex < 0)
                 return;
-            _orderProducts.Add(CbProducts.SelectedItem as Product);
+            if (Eddit)
+            {
+                _order.VoegProductToe(CbProducts.SelectedItem as Product,1);
+            }
+             _orderProducts.Add(CbProducts.SelectedItem as Product);
+            
             NotifyPropertyChanged("TotalPrice"); // Doordat ik zeg: de totaalprijs is veranderd, zal XAML WPF deze property opnieuw ophalen om de user interface aan te passen
             
         }

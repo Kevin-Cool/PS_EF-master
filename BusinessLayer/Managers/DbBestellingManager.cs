@@ -8,13 +8,6 @@ using System.Linq;
 
 namespace BusinessLayer.Managers
 {
-    /*
-    public class CustomerKlant
-    {
-        public Customer Item1 {get;set;}
-        public Klant Item2 {get; set;}
-    }
-     */
     public class DbBestellingManager : IManager<Bestelling>
     {
         #region Properties
@@ -48,8 +41,8 @@ namespace BusinessLayer.Managers
                             HaalKlantOp(c.CustomerId), 
                             (DateTime)c.Time,
                             HaalOrderProdctOpByOrderID(c.Id),
-                            (c.Price is null? false : c.Paid == (int)c.Price),
-                            c.Paid)
+                            c.Paid != 0,
+                            (double?)c.Price)
                         ); 
                     });
             //c.OrderProducts.ToDictionary(o => HaalProdctOp(o.ProductId), o => o.Amount)
@@ -75,23 +68,54 @@ namespace BusinessLayer.Managers
 
         public void VoegToe(Bestelling bestelling)
         {
-            // We mogen geen Id opgeven want database kent deze toe:
-            var order = new Order { CustomerId = bestelling.Klant.KlantId,
-                                    Time = bestelling.Tijdstip,
-                                    Paid = (bestelling.Betaald == true ?  (int)bestelling.PrijsBetaald : 0),
-                                    Price = (decimal?)bestelling.Kostprijs()};
+            if (_mappedObjects.ContainsKey(bestelling.BestellingId) && bestelling.BestellingId != 0)
+            {
+                // update
+                _mappedObjects[bestelling.BestellingId].Item1.Paid = bestelling.Betaald ? 1 : 0;
+                _mappedObjects[bestelling.BestellingId].Item1.Price = (decimal?)bestelling.Kostprijs();
 
-            bestelling.BestellingId = order.Id = _repository.Insert(order); // Customer wordt g-insert-eerd in de database; wordt direct weggeschreven wegens SaveChanges()
-            order.OrderProducts = bestelling.GeefProducten().Select(p => VoegOrderProductToe(p.Key,p.Value,order.Id)).ToList();
-            _mappedObjects[bestelling.BestellingId] = (order, bestelling);
+                _mappedObjects[bestelling.BestellingId].Item1.OrderProducts = null;// don't let ef insert orderProducts 
+                 _repository.Edit(_mappedObjects[bestelling.BestellingId].Item1);
+                _mappedObjects[bestelling.BestellingId].Item1.OrderProducts = bestelling.GeefProducten().Select(p => VoegOrderProductToe(p.Key, p.Value, _mappedObjects[bestelling.BestellingId].Item1.Id)).ToList();
+
+            }
+            else
+            {
+                // create new 
+                // We mogen geen Id opgeven want database kent deze toe:
+                var order = new Order
+                {
+                    CustomerId = bestelling.Klant.KlantId,
+                    Time = bestelling.Tijdstip,
+                    Paid = bestelling.Betaald? 1 : 0,
+                    Price = (decimal?)bestelling.Kostprijs()
+                };
+
+                bestelling.BestellingId = order.Id = _repository.Insert(order); // Customer wordt g-insert-eerd in de database; wordt direct weggeschreven wegens SaveChanges()
+                order.OrderProducts = bestelling.GeefProducten().Select(p => VoegOrderProductToe(p.Key, p.Value, order.Id)).ToList();
+                _mappedObjects[bestelling.BestellingId] = (order, bestelling);
+            }
+           
         }
         public OrderProduct VoegOrderProductToe(Model.Product product,int amount, long orderID)
         {
-            // We mogen geen Id opgeven want database kent deze toe:
-            var orderProduct = new OrderProduct{ProductId = product.ProductId, Amount = amount , OrderId = orderID };
+            OrderProduct orderProduct = null;
+            if (_OrderProduct_mappedObjects.ContainsKey(ConcatInt(product.ProductId,orderID)))
+            {
+                //eddit
+                _OrderProduct_mappedObjects[ConcatInt(product.ProductId, orderID)].Item1.Amount = amount;
+                _repositoryOrderProducts.Edit(_OrderProduct_mappedObjects[ConcatInt(product.ProductId , orderID)].Item1);
+                orderProduct = _OrderProduct_mappedObjects[ConcatInt(product.ProductId, orderID)].Item1;
+            }
+            else
+            {
+                //add
+                // We mogen geen Id opgeven want database kent deze toe:
+                orderProduct = new OrderProduct { ProductId = product.ProductId, Amount = amount, OrderId = orderID };
+                product.ProductId = orderProduct.Id = _repositoryOrderProducts.Insert(orderProduct); // Customer wordt g-insert-eerd in de database; wordt direct weggeschreven wegens SaveChanges()
+                _OrderProduct_mappedObjects[ConcatInt(product.ProductId, orderID)] = (orderProduct, product);
+            }
 
-            orderProduct.Id = _repositoryOrderProducts.Insert(orderProduct);
-            _OrderProduct_mappedObjects[orderProduct.Id] = (orderProduct, product);
             return orderProduct;
         }
         public void Verwijder(Bestelling bestelling)
@@ -112,8 +136,8 @@ namespace BusinessLayer.Managers
                                             HaalKlantOp(Order.CustomerId),
                                             (DateTime)Order.Time,
                                             Order.OrderProducts.ToDictionary(o => HaalProdctOp(o.ProductId), o => o.Amount),
-                                            (Order.Paid == Order.Price),
-                                            Order.Paid)
+                                            Order.Paid != 0,
+                                            (double?)Order.Price)
                                             );
             return _mappedObjects[bestellingid].Item2; 
         }
@@ -143,11 +167,32 @@ namespace BusinessLayer.Managers
             var tempOrderProducts = _repositoryOrderProducts.List();
             foreach (var orderProduct in tempOrderProducts)
             {
+                Model.Product tempProduct = null;
                 if(orderProduct.OrderId == orderID)
-                    ProductenLijst[HaalProdctOp(orderProduct.ProductId)] = orderProduct.Amount;
+                {
+                    tempProduct = HaalProdctOp(orderProduct.ProductId);
+                    ProductenLijst[tempProduct] = orderProduct.Amount;
+                }
+
+                if ((!_OrderProduct_mappedObjects.ContainsKey(ConcatInt(orderProduct.ProductId,orderProduct.OrderId))) && tempProduct != null)
+                    _OrderProduct_mappedObjects.Add(ConcatInt(orderProduct.ProductId, orderProduct.OrderId), (orderProduct, tempProduct));
             }
+
             return ProductenLijst; 
 
+        }
+        public void DeleteOrderProdctOpByOrderID(long orderID)
+        {
+            var tempOrderProducts = _repositoryOrderProducts.List();
+            foreach (var orderProduct in tempOrderProducts)
+            {
+                if (orderProduct.OrderId == orderID)
+                    _repositoryOrderProducts.Delete(orderProduct);
+            }
+        }
+        private long ConcatInt(long a, long b)
+        {
+            return Convert.ToInt64(a + "" + b);
         }
     }
     #endregion

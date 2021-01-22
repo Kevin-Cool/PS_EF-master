@@ -112,7 +112,7 @@ namespace KlantBestellingen.WPF
                 return;
             }
             // Tip: maak dit case insensitive voor "meer punten" ;-) Nog beter: reguliere expressies gebruiken
-            var klanten = Context.KlantManager.HaalOp(k => k.Naam.Contains(tbKlant.Text));
+            var klanten = Context.KlantManager.HaalOp(k => k.Naam.ToLower().Contains(tbKlant.Text.ToLower()));
             cbKlanten.ItemsSource = klanten;
             // Indien er effectief klanten zijn, maak dan dat de eerste klant in de lijst meteen voorgeselecteerd is in de combobox:
             if (klanten.Count > 0)
@@ -169,25 +169,26 @@ namespace KlantBestellingen.WPF
 
         private void EdditBestelling_Click(object sender, RoutedEventArgs e)
         {
-            //MessageBox.Show("Double Click");
-            var row = dgOrderSelection.SelectedItems[0];
-            Bestelling bestelling = row as Bestelling;
-
-            if (_bestellingDetailWindow == null)
+            if(dgOrderSelection.SelectedItems.Count > 0)
             {
-                return;
-            }
+                var row = dgOrderSelection.SelectedItems[0];
+                Bestelling bestelling = row as Bestelling;
 
-            _bestellingDetailWindow.Klant = bestelling.Klant;
-            _bestellingDetailWindow.Order = bestelling;
-            _bestellingDetailWindow.Eddit = true;
-            _bestellingDetailWindow.Show();
+                if (_bestellingDetailWindow == null)
+                {
+                    return;
+                }
+
+                _bestellingDetailWindow.Klant = bestelling.Klant;
+                _bestellingDetailWindow.Order = bestelling;
+                _bestellingDetailWindow.Eddit = true;
+                _bestellingDetailWindow.Show();
+            }
             
         }
 
         private void dgOrderSelection_StatusBar(object sender, SelectionChangedEventArgs e)
         {
-            //MessageBox.Show("Double Click");
             if (dgOrderSelection.SelectedItems.Count > 0)
             {
                 var row = dgOrderSelection.SelectedItems[0];
