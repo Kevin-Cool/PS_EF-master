@@ -69,7 +69,7 @@ namespace ADO.NET.Repos
         {
             try
             {
-                SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM [dbo].[ORDER] WHERE ID = @Id", this.context);
+                SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM [dbo].[ORDER] WHERE ORDER_ID = @Id", this.context);
                 cmd.Parameters.AddWithValue("@Id", a.BestellingId);
                 context.Open();
                 int count = (int)cmd.ExecuteScalar();
@@ -94,23 +94,27 @@ namespace ADO.NET.Repos
                     List<Klant> klanten = new CustomerRepository(this.context).GetAll();
                     List<Product> product = new ProductRepository(this.context).GetAll();
 
-                    List<Bestelling> bestellingen = table.AsEnumerable().Select(a => new Bestelling(a.Field<int>("ID"), klanten.FirstOrDefault(k => k.KlantId.Equals(a.Field<int>("CUSTOMER_ID"))), a.Field<DateTime>("TIME"))).ToList();
+                    List<Bestelling> bestellingen = table.AsEnumerable().Select(a => new Bestelling(a.Field<long>("ORDER_ID"), klanten.FirstOrDefault(k => k.KlantId.Equals(a.Field<long>("CUSTOMER_ID"))), a.Field<DateTime>("TIME"))).ToList();
 
                     foreach (Bestelling b in bestellingen)
                     {
                         context.Open();
                         SqlCommand cmd2 = new SqlCommand("SELECT * FROM [dbo].[ORDER_PRODUCT] WHERE ORDER_ID = @OrderId", this.context);
                         cmd2.Parameters.AddWithValue("@OrderId", b.BestellingId);
-                        SqlDataAdapter reader2 = new SqlDataAdapter(cmd);
+                        SqlDataAdapter reader2 = new SqlDataAdapter(cmd2);
                         DataTable table2 = new DataTable();
                         reader2.Fill(table2);
                         context.Close();
 
-                        if (table2.Rows.Count > 0)
+                        if (table2.Rows.Count > 0)//OrderProduct //OrderId ProductId Amount
                         {
-                            foreach (DataRow dr in table2.AsEnumerable())
+                            List<OrderProduct> orderProducts = table2.AsEnumerable().Select(a => new OrderProduct { OrderId = a.Field<long>("ORDER_ID"), ProductId = a.Field<long>("PRODUCT_ID"), Amount = a.Field<int>("AMOUNT") } ).ToList();
+
+
+
+                            foreach (OrderProduct op in orderProducts)
                             {
-                                b.VoegProductToe(product.First(p => p.ProductId.Equals(dr.Field<long>("PRODUCT_ID"))), dr.Field<int>("AMOUNT"));
+                                b.VoegProductToe(product.First(p => p.ProductId.Equals(op.ProductId)), op.Amount);
                             }
                         }
                     }
@@ -135,7 +139,7 @@ namespace ADO.NET.Repos
                 if (table.Rows.Count > 0)
                 {
                     List<Product> product = new ProductRepository(this.context).GetAll();
-                    Bestelling bestelling = table.AsEnumerable().Select(a => new Bestelling(a.Field<int>("ID"), new CustomerRepository(this.context).GetByID(a.Field<int>("CUSTOMER_ID")), a.Field<DateTime>("TIME"))).Single();
+                    Bestelling bestelling = table.AsEnumerable().Select(a => new Bestelling(a.Field<long>("ORDER_ID"), new CustomerRepository(this.context).GetByID(a.Field<long>("CUSTOMER_ID")), a.Field<DateTime>("TIME"))).Single();
 
                     context.Open();
                     SqlCommand cmd2 = new SqlCommand("SELECT * FROM [dbo].[ORDER_PRODUCT] WHERE ORDER_ID = @OrderId", this.context);
@@ -149,7 +153,7 @@ namespace ADO.NET.Repos
                     {
                         foreach (DataRow dr in table.AsEnumerable())
                         {
-                            bestelling.VoegProductToe(product.First(p => p.ProductId.Equals(dr.Field<int>("PRODUCT_ID"))), dr.Field<int>("AMOUNT"));
+                            bestelling.VoegProductToe(product.First(p => p.ProductId.Equals(dr.Field<long>("PRODUCT_ID"))), dr.Field<int>("AMOUNT"));
                         }
                     }
                     return bestelling;
@@ -163,9 +167,10 @@ namespace ADO.NET.Repos
         {
             try
             {
-                SqlCommand cmd = new SqlCommand("UPDATE [dbo].[ORDER] SET PAID = @Paid WHERE ORDER_ID = @OrderId; TRUNCATE TABLE [dbo].[ORDER_PRODUCT];", this.context);
+                SqlCommand cmd = new SqlCommand("UPDATE [dbo].[ORDER] SET PAID = @Paid WHERE ORDER_ID = @OrderId; DELETE FROM [dbo].[ORDER_PRODUCT] WHERE ORDER_ID = @OrderId;", this.context);
                 cmd.Parameters.AddWithValue("@OrderId", a.BestellingId);
-                cmd.Parameters.AddWithValue("@Paid", a.Betaald);
+                int tempbool = a.Betaald ? 1 : 0;
+                cmd.Parameters.AddWithValue("@Paid", tempbool);
                 context.Open();
                 cmd.ExecuteNonQuery();
                 context.Close();
@@ -175,16 +180,16 @@ namespace ADO.NET.Repos
                 foreach (Product p in dic.Keys)
                 {
                     int id = -1;
-                    String cmd2 = "INSERT INTO [dbo].[ORDER_PRODUCT] (ORDER_ID, PRODUCT_ID, AMOUNT) VALUES (@Paid, @Price, @CustomerId); SELECT CAST(scope_identity() AS int)";
+                    String cmd2 = "INSERT INTO [dbo].[ORDER_PRODUCT] (ORDER_ID, PRODUCT_ID, AMOUNT) VALUES (@OrderId, @ProductId, @Amount)";
                     using (var insertCmd = new SqlCommand(cmd2, this.context))
                     {
                         insertCmd.Parameters.AddWithValue("@OrderId", a.BestellingId);
                         insertCmd.Parameters.AddWithValue("@ProductId", p.ProductId);
-                        insertCmd.Parameters.AddWithValue("@Amount", dic.Keys.First(q => q.ProductId.Equals(p.ProductId)));
+                        insertCmd.Parameters.AddWithValue("@Amount", dic[p]);
                         try
                         {
                             context.Open();
-                            id = (int)insertCmd.ExecuteScalar();
+                            insertCmd.ExecuteScalar();
                             context.Close();
                         }
                         catch (Exception e) { throw e; }
@@ -194,4 +199,13 @@ namespace ADO.NET.Repos
             catch (Exception e) { throw e; }
         }
     }
+    public class OrderProduct 
+    {
+        #region Properties
+        public long OrderId { get; set; }
+        public long ProductId { get; set; }
+        public int Amount { get; set; }
+        #endregion
+    }
+
 }

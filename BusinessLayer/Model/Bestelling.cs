@@ -26,17 +26,17 @@ namespace BusinessLayer.Model
                 Betaald = false;
         }
 
-        public Bestelling(int bestellingId, Klant klant, DateTime tijdstip) : this(bestellingId,tijdstip)
+        public Bestelling(long bestellingId, Klant klant, DateTime tijdstip) : this(bestellingId,tijdstip)
         {           
             ZetKlant(klant);
         }
 
-        public Bestelling(int bestellingId, Klant klant, DateTime tijdstip, Dictionary<Product, int> producten) : this(bestellingId, klant, tijdstip)
+        public Bestelling(long bestellingId, Klant klant, DateTime tijdstip, Dictionary<Product, int> producten) : this(bestellingId, klant, tijdstip)
         {
             if (producten is null) throw new BestellingException("producten zijn leeg");
             _producten = producten;
         }
-        public Bestelling(int bestellingId, Klant klant, DateTime tijdstip, Dictionary<Product, int> producten,bool? betaald, double? prijsBetaald) : this(bestellingId, klant, tijdstip, producten)
+        public Bestelling(long bestellingId, Klant klant, DateTime tijdstip, Dictionary<Product, int> producten,bool? betaald, double? prijsBetaald) : this(bestellingId, klant, tijdstip, producten)
         {
             if (betaald != null) { Betaald = (bool)betaald; }
            

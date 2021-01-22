@@ -45,7 +45,14 @@ namespace BusinessLayer.Managers
             }
             catch (Exception) { throw new ProductException("Errod during adding of product"); }
         }
-
+        public void Update(Bestelling bestelling)
+        {
+            try
+            {
+                uow.Orders.Update(bestelling);
+            }
+            catch (Exception e ) { throw e; }
+        }
         public void Verwijder(Bestelling bestelling)
         {
             uow.Orders.Delete(bestelling.BestellingId);

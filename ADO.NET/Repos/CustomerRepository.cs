@@ -41,7 +41,7 @@ namespace ADO.NET.Repos
         {
             try
             {
-                SqlCommand cmd = new SqlCommand("DELETE FROM [dbo].[CUSTOMER] WHERE Id = @Id;", this.context);
+                SqlCommand cmd = new SqlCommand("DELETE FROM [dbo].[CUSTOMER] WHERE CUSTOMER_ID = @Id;", this.context);
                 cmd.Parameters.AddWithValue("@Id", id);
                 context.Open();
                 cmd.ExecuteNonQuery();
@@ -66,7 +66,7 @@ namespace ADO.NET.Repos
         {
             try
             {
-                SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM [dbo].[CUSTOMER] WHERE LOWER(NAME) = @Name AND LOWER(ADDRESS) = @Address OR ID = @Id", this.context);
+                SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM [dbo].[CUSTOMER] WHERE LOWER(NAME) = @Name AND LOWER(ADDRESS) = @Address OR CUSTOMER_ID = @Id", this.context);
                 cmd.Parameters.AddWithValue("@Name", a.Naam.ToLower());
                 cmd.Parameters.AddWithValue("@Address", a.Adres.ToLower());
                 cmd.Parameters.AddWithValue("@Id", (!ignoreId) ? a.KlantId : -1);
@@ -89,7 +89,7 @@ namespace ADO.NET.Repos
                 reader.Fill(table);
                 context.Close();
                 if (table.Rows.Count > 0)
-                    return table.AsEnumerable().Select(a => new Klant(a.Field<long>("ID"), a.Field<string>("NAME"), a.Field<string>("ADDRESS"))).ToList<Klant>();
+                    return table.AsEnumerable().Select(a => new Klant(a.Field<long>("CUSTOMER_ID"), a.Field<string>("NAME"), a.Field<string>("ADDRESS"))).ToList<Klant>();
             }
             catch (Exception e) { throw e; }
             return new List<Klant>();
@@ -100,14 +100,14 @@ namespace ADO.NET.Repos
             try
             {
                 context.Open();
-                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[CUSTOMER] WHERE ID = @Id", this.context);
+                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[CUSTOMER] WHERE CUSTOMER_ID = @Id", this.context);
                 cmd.Parameters.AddWithValue("@Id", id);
                 SqlDataAdapter reader = new SqlDataAdapter(cmd);
                 DataTable table = new DataTable();
                 reader.Fill(table);
                 context.Close();
                 if (table.Rows.Count > 0)
-                    return table.AsEnumerable().Select(a => new Klant(a.Field<long>("ID"), a.Field<string>("NAME"), a.Field<string>("ADDRESS"))).Single<Klant>();
+                    return table.AsEnumerable().Select(a => new Klant(a.Field<long>("CUSTOMER_ID"), a.Field<string>("NAME"), a.Field<string>("ADDRESS"))).Single<Klant>();
             }
             catch (Exception e) { throw e; }
             return null;
@@ -117,7 +117,7 @@ namespace ADO.NET.Repos
         {
             try
             {
-                SqlCommand cmd = new SqlCommand("UPDATE [dbo].[CUSTOMER] SET NAME = @Name, ADDRESS = @Address WHERE ID = @Id", this.context);
+                SqlCommand cmd = new SqlCommand("UPDATE [dbo].[CUSTOMER] SET NAME = @Name, ADDRESS = @Address WHERE CUSTOMER_ID = @Id", this.context);
                 cmd.Parameters.AddWithValue("@Name", a.Naam);
                 cmd.Parameters.AddWithValue("@Address", a.Adres);
                 cmd.Parameters.AddWithValue("@Id", a.KlantId);

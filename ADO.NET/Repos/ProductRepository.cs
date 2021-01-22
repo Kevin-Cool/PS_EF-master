@@ -25,7 +25,7 @@ namespace ADO.NET.Repos
         public Product Add(Product a)
         {
             int id = -1;
-            String cmd = "INSERT INTO [dbo].[PRODUCT] (NAME,Price) VALUES (@NAME,@Price);SELECT CAST(scope_identity() AS int)";
+            String cmd = "INSERT INTO [dbo].[PRODUCT] (NAME,PRICE) VALUES (@NAME,@Price);SELECT CAST(scope_identity() AS int)";
             using (var insertCmd = new SqlCommand(cmd, this.context))
             {
                 insertCmd.Parameters.AddWithValue("@NAME", a.Naam);
@@ -47,7 +47,7 @@ namespace ADO.NET.Repos
         {
             try
             {
-                SqlCommand cmd = new SqlCommand("DELETE FROM [dbo].[PRODUCT] WHERE Id = @Id", this.context);
+                SqlCommand cmd = new SqlCommand("DELETE FROM [dbo].[PRODUCT] WHERE PRODUCT_ID = @Id", this.context);
                 cmd.Parameters.AddWithValue("@Id", id);
                 context.Open();
                 cmd.ExecuteNonQuery();
@@ -72,7 +72,7 @@ namespace ADO.NET.Repos
         {
             try
             {
-                SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM [dbo].[PRODUCT] WHERE LOWER(NAME) = @NAME AND Price = @Price OR Id = @Id", this.context);
+                SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM [dbo].[PRODUCT] WHERE LOWER(NAME) = @NAME AND PRICE = @Price OR PRODUCT_ID = @Id", this.context);
                 cmd.Parameters.AddWithValue("@NAME", a.Naam.ToLower());
                 cmd.Parameters.AddWithValue("@Price", a.Prijs);
                 cmd.Parameters.AddWithValue("@Id", (!ignoreId) ? a.ProductId : -1);
@@ -95,9 +95,9 @@ namespace ADO.NET.Repos
                 reader.Fill(table);
                 context.Close();
                 if (table.Rows.Count > 0)
-                    return table.AsEnumerable().Select(a => new Product(a.Field<long>("Id"), a.Field<string>("Name"), a.Field<double>("Prijs"))).ToList<Product>();
+                    return table.AsEnumerable().Select(a => new Product(a.Field<long>("PRODUCT_ID"), a.Field<string>("NAME"), (double)a.Field<decimal>("PRICE"))).ToList<Product>();
             }
-            catch (Exception) { throw new QueryException(); }
+            catch (Exception e ) { throw e; }
             return new List<Product>();
         }
 
@@ -106,14 +106,14 @@ namespace ADO.NET.Repos
             try
             {
                 context.Open();
-                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[PRODUCT] WHERE Id = @Id", this.context);
+                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[PRODUCT] WHERE PRODUCT_ID = @Id", this.context);
                 cmd.Parameters.AddWithValue("@Id", id);
                 SqlDataAdapter reader = new SqlDataAdapter(cmd);
                 DataTable table = new DataTable();
                 reader.Fill(table);
                 context.Close();
                 if (table.Rows.Count > 0)
-                    return table.AsEnumerable().Select(a => new Product(a.Field<long>("Id"), a.Field<string>("Name"), a.Field<double>("Prijs"))).Single<Product>();
+                    return table.AsEnumerable().Select(a => new Product(a.Field<long>("PRODUCT_ID"), a.Field<string>("NAME"), a.Field<double>("PRICE"))).Single<Product>();
             }
             catch (Exception) { throw new QueryException(); }
             return null;

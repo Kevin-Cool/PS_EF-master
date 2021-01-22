@@ -69,10 +69,10 @@ namespace KlantBestellingen.WPF
                 return;
             }
 
-            var klant = new Product(TbProductNaam.Text, Double.Parse(TbProductPrijs.Text));
+            var product = new Product(TbProductNaam.Text, Double.Parse(TbProductPrijs.Text));
             // Omdat we een ObservableCollection<Klant> gebruiken, wordt onze wijziging meteen doorgegeven naar de gui (.Items wijzigen zou threading problemen geven):
             // Omdat we ObservableCollection<Klant> gebruiken en er een event gekoppeld is aan delete/add hiervan, wordt ook de business layer aangepast!
-            _producten.Add(klant);
+            _producten.Add(product);
         }
 
         private void Tb_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)

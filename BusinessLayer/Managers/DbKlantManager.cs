@@ -63,6 +63,11 @@ namespace BusinessLayer.Managers
         {
             return uow.Customers.GetByID(klantId);
         }
+
+        public void Update(Klant anItem)
+        {
+            // is never used
+        }
     }
     #endregion
 }

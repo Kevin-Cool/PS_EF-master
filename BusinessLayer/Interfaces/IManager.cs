@@ -10,6 +10,7 @@ namespace BusinessLayer.Interfaces
         IReadOnlyList<T> HaalOp();
         IReadOnlyList<T> HaalOp(Func<T, bool> predicate);
         void VoegToe(T anItem);
+        void Update(T anItem);
         void Verwijder(T anItem);
         T HaalOp(long id);
         /* int:	    -2,147,483,648 to 2,147,483,647	(signed 32-bit integer) DB: int

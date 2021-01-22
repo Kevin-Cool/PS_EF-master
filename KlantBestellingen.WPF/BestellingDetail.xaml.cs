@@ -101,7 +101,7 @@ namespace KlantBestellingen.WPF
                 {
                     return;
                 }
-                
+                UpdateProducts();
                 if (value == null)
                 {
                     // We doen een reset van de nuttige inhoud op het bestellingsvenster:
@@ -159,7 +159,7 @@ namespace KlantBestellingen.WPF
             InitializeComponent();
             DataContext = this;
             _products = new ObservableCollection<Product>(Context.ProductManager.HaalOp());
-            CbProducts.ItemsSource = Context.co.Products;
+            CbProducts.ItemsSource = _products;
             DgProducts.ItemsSource = _orderProducts;
             
         }
@@ -191,7 +191,15 @@ namespace KlantBestellingen.WPF
             _order.Betaald = (bool)CbPrijs.IsChecked;
             _order.PrijsBetaald = total;
 
-            Context.BestellingManager.VoegToe(_order);
+            if (_eddit)
+            {
+                Context.BestellingManager.Update(_order);
+            }
+            else
+            {
+                Context.BestellingManager.VoegToe(_order);
+            }
+            
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
@@ -222,5 +230,12 @@ namespace KlantBestellingen.WPF
             
         }
         #endregion
+
+
+        public void UpdateProducts()
+        {
+            _products = new ObservableCollection<Product>(Context.ProductManager.HaalOp());
+            CbProducts.ItemsSource = _products;
+        }
     }
 }

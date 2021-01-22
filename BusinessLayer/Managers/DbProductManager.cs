@@ -56,6 +56,10 @@ namespace BusinessLayer.Managers
         {
             return uow.Products.GetByID(productId);
         }
+        public void Update(Product anItem)
+        {
+            // is never used
+        }
     }
     #endregion
 }
