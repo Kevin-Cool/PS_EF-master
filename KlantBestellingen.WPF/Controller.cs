@@ -15,10 +15,12 @@ namespace KlantBestellingen.WPF
 
         public Controller()
         {
+            Update()
+            /*
             var timer = new System.Threading.Timer((e) =>
             {
                 Update();
-            }, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+            }, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));*/
         }
 
         public void Update()
