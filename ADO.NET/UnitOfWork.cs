@@ -17,8 +17,8 @@ namespace ADO.NET
 
         public UnitOfWork(String environment = "development")
         {
-            setConnectionString(environment);
-            connection = new SqlConnection(connectionString);
+            //setConnectionString(environment);
+            connection = new SqlConnection("Data Source=DESKTOP-7B94T84\\sqlexpress;Initial Catalog=Bestellingssysteem;Integrated Security=True");
 
             Customers = new CustomerRepository(connection);
             Orders = new OrderRepository(connection);

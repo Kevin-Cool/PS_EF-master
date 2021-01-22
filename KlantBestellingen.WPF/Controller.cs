@@ -15,6 +15,14 @@ namespace KlantBestellingen.WPF
 
         public Controller()
         {
+            var timer = new System.Threading.Timer((e) =>
+            {
+                Update();
+            }, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+        }
+
+        public void Update()
+        {
             Products = new ObservableCollection<Product>(Context.ProductManager.HaalOp());
             Klanten = new ObservableCollection<Klant>(Context.KlantManager.HaalOp());
             Bestellingen = new ObservableCollection<Bestelling>(Context.BestellingManager.HaalOp());

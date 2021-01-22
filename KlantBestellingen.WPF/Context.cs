@@ -17,9 +17,9 @@ namespace KlantBestellingen.WPF
         public static IDFactory IdFactory { get; } = new IDFactory(0, 100, 5000);
         // DbKlantManager!
         public static UnitOfWork uow = new UnitOfWork();
-        public static IManager<Klant> KlantManager { get; } = new DbKlantManager(uow); // Experimenteer: kan ook nog altijd KlantManager zijn!
-        public static IManager<Product> ProductManager { get; } = new DbProductManager(uow);
-        public static IManager<Bestelling> BestellingManager { get; } = new DbBestellingManager(uow);
+        public static IManager<Klant> KlantManager = new DbKlantManager(uow); // Experimenteer: kan ook nog altijd KlantManager zijn!
+        public static IManager<Product> ProductManager  = new DbProductManager(uow);
+        public static IManager<Bestelling> BestellingManager  = new DbBestellingManager(uow);
 
         public static Controller co = new Controller();
         #endregion

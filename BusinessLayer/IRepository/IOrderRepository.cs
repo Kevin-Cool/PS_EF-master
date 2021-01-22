@@ -7,12 +7,11 @@ namespace BusinessLayer.IRepository
 {
     public interface IOrderRepository
     {
-        public Bestelling Add(Bestelling a);
+        public Bestelling Add(Bestelling bestelling);
         public Bestelling GetByID(long id);
         public List<Bestelling> GetAll();
         public void Delete(long id);
         public void DeleteAll();
-        public void Update(Bestelling a);
-        public bool Exist(Bestelling a);
+        public void Update(Bestelling bestelling);
     }
 }

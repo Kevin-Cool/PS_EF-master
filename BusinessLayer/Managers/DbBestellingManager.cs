@@ -39,7 +39,6 @@ namespace BusinessLayer.Managers
 
         public void VoegToe(Bestelling bestelling)
         {
-            if (uow.Orders.Exist(bestelling)) throw new ProductException("Already exists");
             try
             {
                 uow.Orders.Add(bestelling);
