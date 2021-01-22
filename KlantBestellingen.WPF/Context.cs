@@ -1,4 +1,5 @@
 ﻿// HOGENT 
+using ADO.NET;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Managers;
 using BusinessLayer.Model;
@@ -15,9 +16,12 @@ namespace KlantBestellingen.WPF
         #region Properties
         public static IDFactory IdFactory { get; } = new IDFactory(0, 100, 5000);
         // DbKlantManager!
-        public static IManager<Klant> KlantManager { get; } = new DbKlantManager(); // Experimenteer: kan ook nog altijd KlantManager zijn!
-        public static IManager<Product> ProductManager { get; } = new DbProductManager();
-        public static IManager<Bestelling> BestellingManager { get; } = new DbBestellingManager();
+        public static UnitOfWork uow = new UnitOfWork();
+        public static IManager<Klant> KlantManager { get; } = new DbKlantManager(uow); // Experimenteer: kan ook nog altijd KlantManager zijn!
+        public static IManager<Product> ProductManager { get; } = new DbProductManager(uow);
+        public static IManager<Bestelling> BestellingManager { get; } = new DbBestellingManager(uow);
+
+        public static Controller co = new Controller();
         #endregion
 
         // private static DispatcherTimer _timer; // is operationeel volledig los van WPF en de andere code

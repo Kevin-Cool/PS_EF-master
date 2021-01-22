@@ -159,7 +159,7 @@ namespace KlantBestellingen.WPF
             InitializeComponent();
             DataContext = this;
             _products = new ObservableCollection<Product>(Context.ProductManager.HaalOp());
-            CbProducts.ItemsSource = _products;
+            CbProducts.ItemsSource = Context.co.Products;
             DgProducts.ItemsSource = _orderProducts;
             
         }

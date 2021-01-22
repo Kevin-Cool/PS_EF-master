@@ -8,12 +8,11 @@ namespace BusinessLayer.IRepository
     public interface ICustomerRepository
     {
         public Klant Add(Klant a);
-        public Klant GetByID(int id);
+        public Klant GetByID(long id);
         public List<Klant> GetAll();
-        public void Delete(int id);
+        public void Delete(long id);
         public void DeleteAll();
         public void Update(Klant a);
         public bool Exist(Klant a, bool ignoreId = false);
-        public bool HasStrips(int id);
     }
 }
